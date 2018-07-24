@@ -15,6 +15,7 @@ var urlsToProcessQueue = make(chan string, 100)
 func Crawl(seedURL string, threads int) {
 
 	urlsToProcessQueue <- seedURL
+
 	complete := make(chan bool, threads)
 
 	for threadNumber := 0; threadNumber < threads; threadNumber++ {
