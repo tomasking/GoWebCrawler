@@ -8,9 +8,13 @@ import (
 
 func Crawl(seedUrl string, complete chan bool) {
 
-	urlsToProcessQueue := make(chan string, 1000)
+	urlsToProcessQueue := make(chan string, 100)
 	urlsToProcessQueue <- seedUrl
 
+	go processQueue(urlsToProcessQueue, complete)
+	go processQueue(urlsToProcessQueue, complete)
+	go processQueue(urlsToProcessQueue, complete)
+	go processQueue(urlsToProcessQueue, complete)
 	go processQueue(urlsToProcessQueue, complete)
 
 }
@@ -48,11 +52,43 @@ func scrapeURLAndAddToQueue(url string, queue chan string, visited []string) {
 	}
 }
 
+
+
+var collection []string
+
+func add(url string){
+	// Enter Mutex
+	// Logic to add
+	// Exit Mutex
+}
+
+//TODO use map
+
+
 func contains(s []string, e string) bool {
+	var m map[string]struct{}
+
+	if _, ok := m[""]; ok {
+
+	}
+
+	// Enter Mutex
 	for _, a := range s {
 		if a == e {
 			return true
 		}
 	}
 	return false
+	// Exit Mutex
+}
+
+func init(){
+	for {
+		select {
+		case val1 := <-chanA:
+			collection = append(collection, val1)
+		case string, chanB := <-chanC;
+			chanB <- true / false
+		}
+	}
 }

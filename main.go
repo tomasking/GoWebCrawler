@@ -8,7 +8,7 @@ func main() {
 
 	complete := make(chan bool, 1)
 
-	crawler.Crawl("https://monzo.com/", complete)
+	crawler.Crawl("https://mycompany.com", complete) //TODO: pass in URL here
 
 	<-complete
 }

@@ -10,7 +10,7 @@ func filterLinks(inputLinks []string) []string {
 
 	for _, link := range inputLinks {
 		link = sanitise(link)
-		if strings.Contains(link, "monzo.com") {
+		if strings.Contains(link, "mycompany.com") {
 			filteredLinks = append(filteredLinks, link)
 		}
 	}
@@ -22,7 +22,7 @@ func sanitise(input string) string {
 	input = strings.ToLower(input)
 
 	if strings.HasPrefix(input, "/") {
-		input = "https://monzo.com" + input
+		input = "https://mycompany.com" + input
 	}
 
 	return input

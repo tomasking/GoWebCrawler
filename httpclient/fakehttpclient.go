@@ -8,9 +8,9 @@ import (
 // LoadPage returns page from url
 func LoadPage(url string) string {
 
-	if url == "https://monzo.com/" {
+	if url == "https://mycompany.com/" {
 		return loadFile("./TestData/home.html")
-	} else if url == "https://monzo.com/about" {
+	} else if url == "https://mycompany.com/about" {
 		return loadFile("./TestData/about.html")
 	}
 
