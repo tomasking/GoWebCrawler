@@ -2,38 +2,40 @@ package crawler
 
 import (
 	"fmt"
+	"sync"
 
 	"../urlscraper"
 )
 
-func Crawl(seedUrl string, complete chan bool) {
+var visited = make(map[string]bool)
+var mutex = &sync.Mutex{}
+var urlsToProcessQueue = make(chan string, 100)
 
-	urlsToProcessQueue := make(chan string, 100)
-	urlsToProcessQueue <- seedUrl
+// Crawl - performs traverse of site map
+func Crawl(seedURL string, threads int) {
 
-	go processQueue(urlsToProcessQueue, complete)
-	go processQueue(urlsToProcessQueue, complete)
-	go processQueue(urlsToProcessQueue, complete)
-	go processQueue(urlsToProcessQueue, complete)
-	go processQueue(urlsToProcessQueue, complete)
+	urlsToProcessQueue <- seedURL
+	complete := make(chan bool, threads)
 
+	for threadNumber := 0; threadNumber < threads; threadNumber++ {
+		go processQueue(complete, threadNumber)
+	}
+
+	for threadNumber := 0; threadNumber < threads; threadNumber++ {
+		<-complete
+	}
 }
 
-func processQueue(queue chan string, complete chan bool) {
+func processQueue(complete chan bool, thread int) {
 
-	visited := []string{}
-
-	for url := range queue {
-
-		if !contains(visited, url) {
-
-			fmt.Println("Processing: " + url)
-			visited = append(visited, url)
-
-			scrapeURLAndAddToQueue(url, queue, visited)
+	for url := range urlsToProcessQueue {
+		if !haveVisited(url) {
+			fmt.Println("Processing: ", url, thread)
+			addToVisited(url)
+			scrapeURLAndAddToQueue(url)
 		}
 
-		if len(queue) == 0 {
+		if len(urlsToProcessQueue) == 0 {
 			break
 		}
 	}
@@ -41,54 +43,26 @@ func processQueue(queue chan string, complete chan bool) {
 	complete <- true
 }
 
-func scrapeURLAndAddToQueue(url string, queue chan string, visited []string) {
+func addToVisited(url string) {
+	mutex.Lock()
+	visited[url] = true
+	mutex.Unlock()
+}
+
+func haveVisited(url string) bool {
+	mutex.Lock()
+	hasVisited := visited[url]
+	mutex.Unlock()
+	return hasVisited
+}
+
+func scrapeURLAndAddToQueue(url string) {
 
 	filteredLinks := urlscraper.ScrapeLinksFromPageUrl(url)
 	for _, childURL := range filteredLinks {
-		if contains(visited, childURL) {
+		if haveVisited(childURL) {
 			continue
 		}
-		queue <- childURL
-	}
-}
-
-
-
-var collection []string
-
-func add(url string){
-	// Enter Mutex
-	// Logic to add
-	// Exit Mutex
-}
-
-//TODO use map
-
-
-func contains(s []string, e string) bool {
-	var m map[string]struct{}
-
-	if _, ok := m[""]; ok {
-
-	}
-
-	// Enter Mutex
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
-	// Exit Mutex
-}
-
-func init(){
-	for {
-		select {
-		case val1 := <-chanA:
-			collection = append(collection, val1)
-		case string, chanB := <-chanC;
-			chanB <- true / false
-		}
+		urlsToProcessQueue <- childURL
 	}
 }

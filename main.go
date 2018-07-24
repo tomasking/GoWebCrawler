@@ -1,14 +1,17 @@
 package main
 
 import (
+	"fmt"
+	"time"
+
 	"./crawler"
 )
 
 func main() {
 
-	complete := make(chan bool, 1)
+	start := time.Now()
+	crawler.Crawl("https://mycompany.com/", 10)
+	elapsed := time.Since(start)
 
-	crawler.Crawl("https://mycompany.com", complete) //TODO: pass in URL here
-
-	<-complete
+	fmt.Println("Completed in ", elapsed)
 }

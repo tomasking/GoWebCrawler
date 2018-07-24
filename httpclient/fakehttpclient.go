@@ -3,10 +3,13 @@ package httpclient
 import (
 	"fmt"
 	"io/ioutil"
+	"time"
 )
 
 // LoadPage returns page from url
 func LoadPage(url string) string {
+
+	time.Sleep(50 * time.Millisecond)
 
 	if url == "https://mycompany.com/" {
 		return loadFile("./TestData/home.html")
